@@ -1,1 +1,1 @@
-# Calss12Capstone
+# Class12Capstone
