@@ -1,0 +1,8 @@
+const descriptionIsDefined = (visits) => {
+    return visits.description !== undefined;
+}
+
+pm.test("All visits should have a description", function(){ 
+    const visits = pm.response.json(); //gets the data from the pm object
+    pm.expect(visits.every(descriptionIsDefined)).to.be.true
+});
