@@ -1,0 +1,4 @@
+pm.test("Returns 11 visits", function() {
+    const visits = pm.response.json();
+    pm.expect(visits.length).to.eql(10);
+});
