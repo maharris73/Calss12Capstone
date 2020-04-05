@@ -1,39 +1,3 @@
-//Package Clinic--use this code as a Custom Keyword
-package clinic
-
-import static com.kms.katalon.core.checkpoint.CheckpointFactory.findCheckpoint
-import static com.kms.katalon.core.testcase.TestCaseFactory.findTestCase
-import static com.kms.katalon.core.testdata.TestDataFactory.findTestData
-import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
-import static com.kms.katalon.core.testobject.ObjectRepository.findWindowsObject
-
-import com.kms.katalon.core.annotation.Keyword
-import com.kms.katalon.core.checkpoint.Checkpoint
-import com.kms.katalon.core.cucumber.keyword.CucumberBuiltinKeywords as CucumberKW
-import com.kms.katalon.core.mobile.keyword.MobileBuiltInKeywords as Mobile
-import com.kms.katalon.core.model.FailureHandling
-import com.kms.katalon.core.testcase.TestCase
-import com.kms.katalon.core.testdata.TestData
-import com.kms.katalon.core.testobject.TestObject
-import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
-import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
-import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
-import java.text.SimpleDateFormat
-
-
-import internal.GlobalVariable
-
-public class uniqueLast {
-	@Keyword
-	def generateLast(){
-		//SimpleDateFormat formatter= new SimpleDateFormat("yyyy=MM=dd 'at' HH:mm:ss z");
-		Date date = new Date(System.currentTimeMillis());
-		String myLastName = "Jackson" + System.currentTimeMillis();
-	}
-}
-
-//Automation Add a Owner--use this code in Katalon
-
 import static com.kms.katalon.core.checkpoint.CheckpointFactory.findCheckpoint
 import static com.kms.katalon.core.testcase.TestCaseFactory.findTestCase
 import static com.kms.katalon.core.testdata.TestDataFactory.findTestData
@@ -48,6 +12,26 @@ import com.kms.katalon.core.testobject.TestObject as TestObject
 import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 import internal.GlobalVariable as GlobalVariable
+import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
+import static com.kms.katalon.core.testobject.ObjectRepository.findWindowsObject
+import com.kms.katalon.core.testobject.ConditionType as ConditionType
+import com.kms.katalon.core.testobject.RestRequestObjectBuilder as RestRequestObjectBuilder
+import com.kms.katalon.core.testobject.TestObjectProperty as TestObjectProperty
+import java.nio.file.Files as Files
+import java.nio.file.Path as Path
+import java.nio.file.Paths as Paths
+import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
+import com.kms.katalon.core.testobject.RequestObject
+import com.kms.katalon.core.testobject.ResponseObject
+import com.kms.katalon.core.testobject.impl.HttpTextBodyContent
+import static org.assertj.core.api.Assertions.*
+import com.kms.katalon.core.webservice.verification.WSResponseManager
+
+import groovy.json.JsonSlurper
+import internal.GlobalVariable as GlobalVariable
+
+//Input data from Petclinic
+CustomKeywords.'clinic.uniqueLast.generateLast'()
 
 WebUI.openBrowser('')
 
@@ -61,12 +45,38 @@ WebUI.click(findTestObject('Object Repository/Page_SpringPetclinicAngular/span_A
 
 WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_First Name_firstName'), 'Priest')
 
-WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Last Name_lastName'), 'Holmes')
+WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Last Name_lastName'), CustomKeywords.'clinic.uniqueLast.generateLast'())
 
-WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Address_address'), '2301 Jackson Street')
+WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Address_address'), Street)
 
-WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_City_city'), 'Austin')
+WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_City_city'), city)
 
-WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Telephone_telephone'), '2143331212')
+WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Telephone_telephone'), phone)
 
-WebUI.click(findTestObject('Object Repository/Page_SpringPetclinicAngular/button_Add Owner'))
+WebUI.click(findTestObject('Page_SpringPetclinicAngular/button_Add Owner'))
+
+//Validation Code using JsonSlurper
+
+def response = WS.sendRequest(findTestObject('Object Repository/OwnerAPI')) //get Owner API data and store in variable called "response"
+def slurper = new groovy.json.JsonSlurper()
+def result = slurper.parseText(response.getResponseBodyContent()) //JsonSlurper parse api body 
+
+def value = result.lastName
+
+println("..value extracted is : "+ value) 
+
+
+//Create an Object Repository called "OwnerAPI" using [GET] http://admin:admin@clinic.doveryai-no-proveryai.com:9966/petclinic/api/owners
+
+//validation code for API
+import static org.assertj.core.api.Assertions.*
+import com.kms.katalon.core.testobject.RequestObject
+import com.kms.katalon.core.testobject.ResponseObject
+import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
+import com.kms.katalon.core.webservice.verification.WSResponseManager
+import groovy.json.JsonSlurper
+import internal.GlobalVariable as GlobalVariable
+RequestObject request = WSResponseManager.getInstance().getCurrentRequest()
+ResponseObject response = WSResponseManager.getInstance().getCurrentResponse()
+WS.verifyElementPropertyValue(response, '[4].lastName', "McTavish")
+
