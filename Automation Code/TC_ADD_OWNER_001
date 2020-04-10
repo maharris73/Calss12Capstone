@@ -26,13 +26,12 @@ import com.kms.katalon.core.testobject.ResponseObject
 import com.kms.katalon.core.testobject.impl.HttpTextBodyContent
 import static org.assertj.core.api.Assertions.*
 import com.kms.katalon.core.webservice.verification.WSResponseManager
-
 import groovy.json.JsonSlurper
 import internal.GlobalVariable as GlobalVariable
 
 //Input data from Petclinic
 CustomKeywords.'clinic.uniqueLast.generateLast'()
-
+//Automating adding a new Veterinarian
 WebUI.openBrowser('')
 
 WebUI.navigateToUrl('http://admin:admin@clinic.doveryai-no-proveryai.com:9966/petclinic/swagger-ui.html')
@@ -43,40 +42,54 @@ WebUI.click(findTestObject('Object Repository/Page_SpringPetclinicAngular/a_Owne
 
 WebUI.click(findTestObject('Object Repository/Page_SpringPetclinicAngular/span_Add New'))
 
-WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_First Name_firstName'), 'Priest')
+//Custom Keyword for variable firstName "Jason"
+def firstName =  CustomKeywords.'clinic.uniqueFirst.generateFirst'()
 
-WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Last Name_lastName'), CustomKeywords.'clinic.uniqueLast.generateLast'())
+WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_First Name_firstName'), firstName)
 
-WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Address_address'), Street)
+//Custom Keyword for variable LastName "Jackson(timestamp)"
+def lastName = CustomKeywords.'clinic.uniqueLast.generateLast'()
+
+WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Last Name_lastName'), lastName)
+
+//Custom Keyword for variable address "2500 Thunderdome Dr"
+def street = CustomKeywords.'clinic.street.generateStreet'()
+
+WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Address_address'), street)
+
+//Custom Keyword for variable city "Austin"
+def city = CustomKeywords.'clinic.city.generateCity'()
 
 WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_City_city'), city)
 
-WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Telephone_telephone'), phone)
+//Custom Keyword for variable telephone "2143189930"
+def telephone = CustomKeywords.'clinic.telephone.generateTelephone'()
+
+WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/input_Telephone_telephone'), telephone)
 
 WebUI.click(findTestObject('Page_SpringPetclinicAngular/button_Add Owner'))
 
-//Validation Code using JsonSlurper
-
+//Formatting with JsonSlurper for JSON fields
 def response = WS.sendRequest(findTestObject('Object Repository/OwnerAPI')) //get Owner API data and store in variable called "response"
 def slurper = new groovy.json.JsonSlurper()
 def result = slurper.parseText(response.getResponseBodyContent()) //JsonSlurper parse api body 
+def value = result[(result.size() - 1)]
+//End of JSON formatting
 
-def value = result.lastName
+//Verification of all entries
+WS.verifyEqual(firstName, value.firstName)
+WS.verifyEqual(lastName, value.lastName)
+WS.verifyEqual(street, value.address)
+WS.verifyEqual(city, value.city)
+WS.verifyEqual(telephone, value.telephone)
+//End of Verification
 
+//Printing Output to Console
 println("..value extracted is : "+ value) 
-
-
-//Create an Object Repository called "OwnerAPI" using [GET] http://admin:admin@clinic.doveryai-no-proveryai.com:9966/petclinic/api/owners
-
-//validation code for API
-import static org.assertj.core.api.Assertions.*
-import com.kms.katalon.core.testobject.RequestObject
-import com.kms.katalon.core.testobject.ResponseObject
-import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
-import com.kms.katalon.core.webservice.verification.WSResponseManager
-import groovy.json.JsonSlurper
-import internal.GlobalVariable as GlobalVariable
-RequestObject request = WSResponseManager.getInstance().getCurrentRequest()
-ResponseObject response = WSResponseManager.getInstance().getCurrentResponse()
-WS.verifyElementPropertyValue(response, '[4].lastName', "McTavish")
-
+println("..Results are: "+ firstName + " is to " + value.firstName)
+println("..Results are: "+ lastName + " is to " + value.lastName)
+println("..Results are: "+ street + " is to " + value.address)
+println("..Results are: "+ city + " is to " + value.city)
+println("..Results are: "+ telephone + "is to " + value.telephone)
+println(result.size())
+//End of Print to Console
