@@ -12,10 +12,21 @@ import com.kms.katalon.core.testdata.TestData as TestData
 import com.kms.katalon.core.testobject.TestObject as TestObject
 import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
 import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+import com.kms.katalon.core.webui.keyword.internal.WebUIAbstractKeyword
 import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
-import groovy.json.JsonSlurper
+import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WSBuiltInKeywords
+import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUiBuiltInKeywords
+import com.kms.katalon.core.keyword.BuiltinKeywords
+import com.kms.katalon.core.annotation.Keyword as Keyword
+import com.kms.katalon.core.testobject.ObjectRepository as ObjectRepository
+import com.katalon.plugin.keyword.angularjs.DropdownKeywords
+
+import groovy.json.JsonSlurper as JsonSlurper
+import groovy.transform.CompileStatic
+
+//Automating adding a new Veterinarian
 
 WebUI.openBrowser('')
 
@@ -23,31 +34,63 @@ WebUI.navigateToUrl('http://admin:admin@clinic.doveryai-no-proveryai.com:9966/pe
 
 WebUI.navigateToUrl('https://clinic.doveryai-no-proveryai.com/petclinic/')
 
-WebUI.click(findTestObject('Page_SpringPetclinicAngular/a_Veterinarians'))
+WebUI.click(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/a_Veterinarians'))
 
-WebUI.click(findTestObject('Page_SpringPetclinicAngular/a_Add New'))
+WebUI.click(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/a_Add New'))
 
-WebUI.setText(findTestObject('Page_SpringPetclinicAngular/input_First Name_firstName'), 'Jason')
+//Custom Keyword for variable firstName "Jason"
+def firstName = CustomKeywords.'clinic.uniqueFirst.generateFirst'()
 
-WebUI.setText(findTestObject('Page_SpringPetclinicAngular/input_Last Name_lastName'), CustomKeywords.'clinic.uniqueLast.generateLast'())
+WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/input_First Name_firstName'), firstName)
 
-WebUI.selectOptionByValue(findTestObject('Page_SpringPetclinicAngular/select_Backiotomy  ENT  General Practice (r_0b27fb'), 
-    '5: Object', true)
+//Custom Keyword for variable LastName "Jackson(timestamp)
+def lastName = CustomKeywords.'clinic.uniqueLast.generateLast'()
 
-WebUI.click(findTestObject('Page_SpringPetclinicAngular/button_Save Vet'))
+WebUI.setText(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/input_Last Name_lastName'), lastName)
 
-WebUI.click(findTestObject('Object Repository/Page_SpringPetclinicAngular/button_Home'))
+// variable objectText is used to pull the value of the selected dropdown item
+def objectText = CustomKeywords.'com.katalon.plugin.keyword.angularjs.DropdownKeywords.verifyOptionSelectedByName'(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/select_Backiotomy  ENT  General Practice (r_0b27fb'), 'Backiotomy')
+
+//Selection of Dropdown item value '6: Object' Label 'PET GROOMING'
+WebUI.selectOptionByValue(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/select_Backiotomy  ENT  General Practice (r_0b27fb'),'6: Object', true)
+
+WebUI.click(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/button_Save Vet'))
+
+WebUI.click(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/button_Home'))
 
 WebUI.closeBrowser()
 
+//Formatting with JsonSlurper for JSON fields
 
-//Validation Code using JsonSlurper
+def response = WS.sendRequest(findTestObject('Object Repository/Add Vet'))
 
-def response = WS.sendRequest(findTestObject('Object Repository/Add Vet')) //get Owner API data and store in variable called "response"
-def slurper = new groovy.json.JsonSlurper()
-def result = slurper.parseText(response.getResponseBodyContent()) //JsonSlurper parse api body
+def slurper = new JsonSlurper()
 
-def value = result.lastName
+def result = slurper.parseText(response.getResponseBodyContent())
 
-println("..value extracted is : "+ value)
+//Retreives all data for vet added to API
 
+def value = result[(result.size() - 1)]
+
+def spec = value.specialties.name
+//End of JSON formatting
+
+//Verification of all entries
+
+WS.verifyEqual(firstName, value.firstName)
+
+WS.verifyEqual(lastName, value.lastName)
+
+//WS.verifyEqual(objectText, spec)
+//End of Validation
+
+//Printing Output to Console
+
+println('..value extracted is : ' + value)
+
+//println('..value of speciality is : ' + spec)
+
+println('..value in text is : ' + objectText)
+
+println(result.size())
+//End of Print to Console
