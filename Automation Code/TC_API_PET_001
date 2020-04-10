@@ -1,6 +1,16 @@
 //validating POST command with Curl directly to API
 
-curl --location --request POST 'http://clinic.doveryai-no-proveryai.com:9966/petclinic/api/pettypes' --header 'Authorization: Basic YWRtaW46YWRtaW4=' --header "Content-Type: application/json" --data-raw '{
+curl --location --request POST 'http://clinic.doveryai-no-proveryai.com:9966/petclinic/api/pettypes' 
+--header 'Authorization: Basic YWRtaW46YWRtaW4=' 
+--header "Content-Type: application/json" --data-raw '{
   "id": 122,
-  "name": "vulture"
+  "name": "Badger1"
 }'
+
+
+
+//Use GET command to verify entry succeeded 
+//search for Badger1 in list
+curl --location --request GET 'http://clinic.doveryai-no-proveryai.com:9966/petclinic/api/pettypes' \
+--header 'Authorization: Basic YWRtaW46YWRtaW4=' \
+--header 'Cookie: JSESSIONID=A945D613E7E27A9DD8546D7300D7AB8E'
