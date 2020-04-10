@@ -1,0 +1,4 @@
+pm.test("Returns accurate number of pets", function() {
+    const pets = pm.response.json();
+    pm.expect(pets.length).to.eql(35);
+});
