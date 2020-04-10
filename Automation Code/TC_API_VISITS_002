@@ -1,3 +1,8 @@
+//Using Postman to validate entry that all visits have a description is true
+//Basic Auth: admin:admin
+//api GET:http://clinic.doveryai-no-proveryai.com:9966/petclinic/api/visits
+
+
 const descriptionIsDefined = (visits) => {
     return visits.description !== undefined;
 }
