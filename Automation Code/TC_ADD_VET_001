@@ -76,21 +76,14 @@ def spec = value.specialties.name
 //End of JSON formatting
 
 //Verification of all entries
-
 WS.verifyEqual(firstName, value.firstName)
-
 WS.verifyEqual(lastName, value.lastName)
-
-//WS.verifyEqual(objectText, spec)
+WS.verifyEqual(objectText, spec)
 //End of Validation
 
 //Printing Output to Console
-
 println('..value extracted is : ' + value)
-
-//println('..value of speciality is : ' + spec)
-
+println('..value of speciality is : ' + spec)
 println('..value in text is : ' + objectText)
-
 println(result.size())
 //End of Print to Console
