@@ -54,6 +54,9 @@ def objectText = CustomKeywords.'com.katalon.plugin.keyword.angularjs.DropdownKe
 //Selection of Dropdown item value '6: Object' Label 'PET GROOMING'
 WebUI.selectOptionByValue(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/select_Backiotomy  ENT  General Practice (r_0b27fb'),'6: Object', true)
 
+
+// verify optionby value to receive boolean value of true or false
+def optionVal = WebUI.verifyOptionSelectedByValue(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/select_Backiotomy  ENT  General Practice (r_0b27fb'),"6: Object" , true, 20)
 WebUI.click(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/button_Save Vet'))
 
 WebUI.click(findTestObject('Object Repository/Page_SpringPetclinicAngular/Page_SpringPetclinicAngular/button_Home'))
@@ -84,6 +87,6 @@ WS.verifyEqual(objectText, spec)
 //Printing Output to Console
 println('..value extracted is : ' + value)
 println('..value of speciality is : ' + spec)
-println('..value in text is : ' + objectText)
+println('..equal value in Type  is : ' + optionVal)
 println(result.size())
 //End of Print to Console
