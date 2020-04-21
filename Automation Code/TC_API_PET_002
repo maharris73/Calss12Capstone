@@ -1,7 +1,0 @@
-//test pettypes API to return the current number of pettypes in the API
-//Prior to running test verify the actual number of pettypes using the GET function
-
-pm.test("Returns accurate number of pets", function() {
-    const pets = pm.response.json();
-    pm.expect(pets.length).to.eql(35);
-});
